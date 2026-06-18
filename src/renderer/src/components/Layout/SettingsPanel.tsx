@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ExternalLink, Eye, EyeOff, Save, CheckCircle, Key, Bot, Sliders } from 'lucide-react'
+import { ExternalLink, Eye, EyeOff, Save, CheckCircle, Key, Bot, Sliders, HelpCircle, Github, BookOpen, Mail, Heart, Globe } from 'lucide-react'
 import { ApiClient } from '../../lib/api'
 import type { Settings } from '@shared/types'
 
@@ -47,12 +47,13 @@ const PROVIDERS: ProviderInfo[] = [
   { label: 'Moonshot AI (Kimi)', envKey: 'MOONSHOT_API_KEY', url: 'https://platform.moonshot.ai/console/api-keys' }
 ]
 
-type Tab = 'keys' | 'debate' | 'general'
+type Tab = 'keys' | 'debate' | 'general' | 'help'
 
 const TABS: { id: Tab; label: string; icon: typeof Key }[] = [
   { id: 'keys', label: 'API Keys', icon: Key },
   { id: 'debate', label: 'Debate', icon: Bot },
   { id: 'general', label: 'General', icon: Sliders },
+  { id: 'help', label: 'Help', icon: HelpCircle },
 ]
 
 export function SettingsPanel({ serverPort, settings, onUpdate }: Props) {
@@ -337,6 +338,126 @@ export function SettingsPanel({ serverPort, settings, onUpdate }: Props) {
               </label>
             )}
           </div>
+        </section>
+      )}
+
+      {activeTab === 'help' && (
+        <section className="mb-8 space-y-6">
+          {/* About */}
+          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">
+                OR
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Omni-Router</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Version 1.0.0 &middot; MIT License</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                  A multi-provider AI chat assistant with smart routing, quota management, debate mode, and a code agent.
+                  Connects to 28 AI providers and automatically routes each message to the best model for the task.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Documentation */}
+          <div>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+              <BookOpen size={18} className="text-blue-500" />
+              Documentation
+            </h3>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <a href="https://github.com/mamoonk/omni-router/wiki" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
+                <BookOpen size={18} className="text-gray-400 group-hover:text-blue-500 shrink-0" />
+                <div className="min-w-0">
+                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100">Wiki &amp; Guides</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 truncate">Installation, routing, providers, FAQ</div>
+                </div>
+                <ExternalLink size={14} className="ml-auto text-gray-400 shrink-0" />
+              </a>
+              <a href="https://github.com/mamoonk/omni-router/wiki/API-Keys" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
+                <Key size={18} className="text-gray-400 group-hover:text-blue-500 shrink-0" />
+                <div className="min-w-0">
+                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100">API Key Setup</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 truncate">How to get and configure provider keys</div>
+                </div>
+                <ExternalLink size={14} className="ml-auto text-gray-400 shrink-0" />
+              </a>
+              <a href="https://github.com/mamoonk/omni-router/wiki/Routing" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
+                <Sliders size={18} className="text-gray-400 group-hover:text-blue-500 shrink-0" />
+                <div className="min-w-0">
+                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100">Routing Strategies</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 truncate">Smart, cheapest, fastest, round-robin</div>
+                </div>
+                <ExternalLink size={14} className="ml-auto text-gray-400 shrink-0" />
+              </a>
+              <a href="https://github.com/mamoonk/omni-router/wiki/FAQ" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
+                <HelpCircle size={18} className="text-gray-400 group-hover:text-blue-500 shrink-0" />
+                <div className="min-w-0">
+                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100">FAQ &amp; Troubleshooting</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 truncate">Common questions and fixes</div>
+                </div>
+                <ExternalLink size={14} className="ml-auto text-gray-400 shrink-0" />
+              </a>
+            </div>
+          </div>
+
+          {/* Links */}
+          <div>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+              <Github size={18} className="text-gray-500" />
+              Links
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              <a href="https://github.com/mamoonk/omni-router" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300">
+                <Github size={16} /> Source Code
+              </a>
+              <a href="https://github.com/mamoonk/omni-router/issues" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300">
+                <HelpCircle size={16} /> Report Issue
+              </a>
+              <a href="https://github.com/mamoonk/omni-router/wiki/Development" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300">
+                <BookOpen size={16} /> Contributing
+              </a>
+              <a href="https://paypal.me/mrk827274" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-lg border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors text-sm font-medium">
+                <Heart size={16} /> Donate
+              </a>
+            </div>
+          </div>
+
+          {/* Author */}
+          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">About the Author</h3>
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                MK
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100">Mamoon Khan</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Software Engineer &amp; AI Developer</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                  Mamoon Khan is the creator and sole maintainer of Omni-Router. With a passion for making AI accessible,
+                  he built Omni-Router to eliminate the complexity of managing multiple AI providers — giving everyone
+                  free access to the best models through a single, unified interface. The project is open-source under
+                  the MIT license and welcomes community contributions.
+                </p>
+                <div className="flex flex-wrap gap-3 mt-4">
+                  <a href="https://github.com/mamoonk" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                    <Github size={15} /> github.com/mamoonk
+                  </a>
+                  <a href="mailto:mamoonk@gmail.com" className="flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                    <Mail size={15} /> mamoonk@gmail.com
+                  </a>
+                  <a href="https://github.com/mamoonk/omni-router" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                    <Globe size={15} /> Project Repository
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-center text-xs text-gray-400 dark:text-gray-600 pt-2">
+            Omni-Router &copy; 2026 Mamoon Khan &middot; MIT License &middot; Made with care for the open-source community
+          </p>
         </section>
       )}
     </div>
