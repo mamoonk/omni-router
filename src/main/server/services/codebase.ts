@@ -1,6 +1,14 @@
 import { readdirSync, readFileSync, statSync } from 'fs'
 import { join, relative } from 'path'
-import { app } from 'electron'
+
+function getProjectRoot(): string {
+  try {
+    const { app } = require('electron')
+    return join(app.getAppPath(), '..')
+  } catch {
+    return process.cwd()
+  }
+}
 
 const SOURCE_DIRS = ['src']
 const INCLUDE_EXTENSIONS = new Set([
@@ -18,10 +26,6 @@ export interface FileEntry {
 export interface CodebaseContext {
   fileTree: string
   fileContents: Array<{ path: string; content: string }>
-}
-
-function getProjectRoot(): string {
-  return join(app.getAppPath(), '..')
 }
 
 export function getFileTree(): string {

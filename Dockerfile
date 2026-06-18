@@ -32,11 +32,11 @@ COPY --from=builder /app/shared ./shared
 COPY --from=builder /app/tsconfig.json ./
 
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=8080
 ENV MYROUTER_DB_PATH=/data/omni-router.db
 
 VOLUME ["/data"]
 
-EXPOSE 3000
+EXPOSE 8080
 
 CMD ["node", "--import", "tsx", "src/web/server.ts"]

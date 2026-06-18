@@ -1,4 +1,3 @@
-import { app } from 'electron'
 import { join } from 'path'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import dotenv from 'dotenv'
@@ -14,7 +13,18 @@ const ENV_VARS = [
 ]
 
 function getEnvPath(): string {
-  return join(app.getPath('userData'), '.env')
+  if (process.env.MYROUTER_ENV_PATH) {
+    return process.env.MYROUTER_ENV_PATH
+  }
+  if (process.env.MYROUTER_DB_PATH) {
+    return join(process.env.MYROUTER_DB_PATH, '..', '.env')
+  }
+  try {
+    const { app } = require('electron')
+    return join(app.getPath('userData'), '.env')
+  } catch {
+    return join(process.cwd(), 'data', '.env')
+  }
 }
 
 export function loadEnv(): void {

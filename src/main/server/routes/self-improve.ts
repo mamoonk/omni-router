@@ -1,12 +1,16 @@
 import { Router } from 'express'
 import { writeFileSync, mkdirSync } from 'fs'
 import { join, dirname, normalize, relative } from 'path'
-import { app } from 'electron'
 
 export const selfImproveRouter = Router()
 
 function getProjectRoot(): string {
-  return join(app.getAppPath(), '..')
+  try {
+    const { app } = require('electron')
+    return join(app.getAppPath(), '..')
+  } catch {
+    return process.cwd()
+  }
 }
 
 function isPathSafe(targetPath: string): boolean {
