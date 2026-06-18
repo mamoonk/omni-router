@@ -137,8 +137,8 @@ All chat responses stream token-by-token via Server-Sent Events, showing:
 
 ```bash
 # Clone the repository
-git clone https://github.com/mamoonk/omnirouter.git
-cd omnirouter
+git clone https://github.com/mamoonk/omni-router.git
+cd omni-router
 
 # Install dependencies
 npm install
