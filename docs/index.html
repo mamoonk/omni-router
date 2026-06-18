@@ -36,8 +36,16 @@
     .install-hero .cmd-desc { font-size: 0.85rem; color: #8b949e; margin-bottom: 1rem }
     .install-hero pre {
       border: 1px solid #238636; border-radius: 8px; background: #0d1117;
-      padding: 1.2rem; font-size: 1rem; margin: 0
+      padding: 1.2rem; font-size: 1rem; margin: 0; position: relative
     }
+    .install-hero pre .copy-btn {
+      position: absolute; top: 8px; right: 8px; background: #238636; border: none;
+      color: #fff; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer;
+      font-size: 0.75rem; font-weight: 600; opacity: 0; transition: opacity .2s;
+      display: flex; align-items: center; gap: 4px
+    }
+    .install-hero pre:hover .copy-btn { opacity: 1 }
+    .install-hero pre .copy-btn.copied { background: #2ea043 }
     .install-hero pre .prompt { color: #238636; user-select: none }
     .install-hero pre .cmd { color: #7ee787 }
     .install-hero .tab-row { display: flex; gap: 0.5rem; margin-bottom: 0.8rem }
@@ -120,13 +128,13 @@
       </div>
 
       <div class="tab-content active" id="tab-unix">
-        <pre><code><span class="prompt">$</span> <span class="cmd">curl -fsSL https://raw.githubusercontent.com/mamoonk/omni-router/master/install.sh | bash</span></code></pre>
+        <pre><button class="copy-btn" data-cmd="curl -fsSL https://raw.githubusercontent.com/mamoonk/omni-router/master/install.sh | bash">📋 Copy</button><code><span class="prompt">$</span> <span class="cmd">curl -fsSL https://raw.githubusercontent.com/mamoonk/omni-router/master/install.sh | bash</span></code></pre>
       </div>
       <div class="tab-content" id="tab-windows">
-        <pre><code><span class="prompt">PS&gt;</span> <span class="cmd">iwr -Uri https://raw.githubusercontent.com/mamoonk/omni-router/master/install.ps1 | iex</span></code></pre>
+        <pre><button class="copy-btn" data-cmd="iwr -Uri https://raw.githubusercontent.com/mamoonk/omni-router/master/install.ps1 | iex">📋 Copy</button><code><span class="prompt">PS&gt;</span> <span class="cmd">iwr -Uri https://raw.githubusercontent.com/mamoonk/omni-router/master/install.ps1 | iex</span></code></pre>
       </div>
       <div class="tab-content" id="tab-manual">
-        <pre><code><span class="prompt">$</span> <span class="cmd">git clone https://github.com/mamoonk/omni-router.git</span>
+        <pre><button class="copy-btn" data-cmd="git clone https://github.com/mamoonk/omni-router.git && cd omni-router && npm install && npm run build && npm run dev">📋 Copy</button><code><span class="prompt">$</span> <span class="cmd">git clone https://github.com/mamoonk/omni-router.git</span>
 <span class="prompt">$</span> <span class="cmd">cd omni-router</span>
 <span class="prompt">$</span> <span class="cmd">npm install</span>
 <span class="prompt">$</span> <span class="cmd">npm run build</span>
@@ -277,6 +285,33 @@
         group.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'))
         btn.classList.add('active')
         group.querySelector('#tab-' + btn.dataset.tab).classList.add('active')
+      })
+    })
+
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(btn.dataset.cmd)
+          btn.textContent = '✓ Copied!'
+          btn.classList.add('copied')
+          setTimeout(() => {
+            btn.textContent = '📋 Copy'
+            btn.classList.remove('copied')
+          }, 2000)
+        } catch {
+          const ta = document.createElement('textarea')
+          ta.value = btn.dataset.cmd
+          document.body.appendChild(ta)
+          ta.select()
+          document.execCommand('copy')
+          document.body.removeChild(ta)
+          btn.textContent = '✓ Copied!'
+          btn.classList.add('copied')
+          setTimeout(() => {
+            btn.textContent = '📋 Copy'
+            btn.classList.remove('copied')
+          }, 2000)
+        }
       })
     })
   </script>
