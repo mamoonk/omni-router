@@ -186,6 +186,7 @@ export function SettingsPanel({ serverPort, settings, onUpdate }: Props) {
                     href={p.url}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => { e.preventDefault(); window.open(p.url, '_blank', 'noopener,noreferrer') }}
                     className="shrink-0 flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 whitespace-nowrap"
                   >
                     Get key
