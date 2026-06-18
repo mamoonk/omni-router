@@ -419,7 +419,7 @@ export function SettingsPanel({ serverPort, settings, onUpdate }: Props) {
                 <BookOpen size={16} /> Contributing
               </a>
               <a href="https://paypal.me/mrk827274" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-lg border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors text-sm font-medium">
-                <Heart size={16} /> Donate
+                <Heart size={16} /> Buy Me Tea
               </a>
             </div>
           </div>
