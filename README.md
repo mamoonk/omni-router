@@ -129,25 +129,27 @@ All chat responses stream token-by-token via Server-Sent Events, showing:
 
 ## Getting Started
 
-### Prerequisites
-- Node.js 18+
-- npm
+### Quick Install
 
-### Installation
+**macOS / Linux**
+```bash
+curl -fsSL https://raw.githubusercontent.com/mamoonk/omni-router/master/install.sh | bash
+```
+
+**Windows (PowerShell)**
+```powershell
+iwr -Uri https://raw.githubusercontent.com/mamoonk/omni-router/master/install.ps1 | iex
+```
+
+### Manual Setup
+
+**Prerequisites:** Node.js 18+, npm, git
 
 ```bash
-# Clone the repository
 git clone https://github.com/mamoonk/omni-router.git
 cd omni-router
-
-# Install dependencies
 npm install
-
-# Set up API keys (optional — configure via Settings UI)
-# Copy .env and add your keys:
-# GEMINI_API_KEY=your_key_here
-# OPENAI_API_KEY=your_key_here
-# ... etc.
+npm run build
 ```
 
 ### Development
@@ -157,6 +159,12 @@ npm run dev
 ```
 
 Launches the Electron app with hot-reload for both the renderer (React) and main (Electron/Express) processes.
+
+### Web Server
+
+```bash
+npm run build:web && npm run start:web
+```
 
 ### Build
 
