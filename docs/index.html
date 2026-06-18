@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omni-Router — Multi-Provider AI Chat Router</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      background: #0d1117; color: #c9d1d9; line-height: 1.6;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem 4rem }
+
+    header { text-align: center; padding: 3rem 0 2rem }
+    header h1 { font-size: 2.5rem; color: #f0f6fc }
+    header p { font-size: 1.1rem; color: #8b949e; margin-top: 0.5rem }
+    header .badges { margin-top: 1rem }
+    header .badges img { height: 20px; margin: 0 2px }
+
+    section { margin: 2.5rem 0 }
+    section h2 { font-size: 1.4rem; color: #f0f6fc; margin-bottom: 1rem; padding-bottom: 0.4rem; border-bottom: 1px solid #21262d }
+
+    .features { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem }
+    .feature { background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 1.2rem }
+    .feature h3 { font-size: 1rem; color: #f0f6fc; margin-bottom: 0.3rem }
+    .feature p { font-size: 0.9rem; color: #8b949e }
+
+    .platform-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: none }
+    .tab-btn {
+      flex: 1; padding: 0.7rem 1rem; font-size: 0.9rem; font-weight: 600;
+      background: #161b22; border: 1px solid #30363d; color: #8b949e; cursor: pointer;
+      border-radius: 0; transition: all .15s
+    }
+    .tab-btn:first-child { border-radius: 8px 0 0 0 }
+    .tab-btn:last-child { border-radius: 0 8px 0 0 }
+    .tab-btn.active { background: #1f2937; border-color: #58a6ff; color: #f0f6fc }
+    .tab-content { display: none }
+    .tab-content.active { display: block }
+
+    pre {
+      background: #161b22; border: 1px solid #30363d; border-radius: 0 0 8px 8px;
+      padding: 1.2rem; overflow-x: auto; font-size: 0.85rem; margin-top: -1px
+    }
+    pre .cmd { color: #7ee787 }
+    pre .comment { color: #8b949e }
+
+    .btn {
+      display: inline-block; padding: 0.7rem 1.5rem; font-size: 0.95rem; font-weight: 600;
+      border-radius: 8px; text-decoration: none; transition: background .15s
+    }
+    .btn-primary { background: #238636; color: #fff }
+    .btn-primary:hover { background: #2ea043 }
+    .btn-outline { background: transparent; border: 1px solid #30363d; color: #c9d1d9 }
+    .btn-outline:hover { background: #1f2937 }
+
+    .footer { text-align: center; padding-top: 2rem; color: #8b949e; font-size: 0.9rem }
+    .footer a { color: #58a6ff; text-decoration: none }
+
+    .provider-list { display: flex; flex-wrap: wrap; gap: 0.5rem }
+    .provider-list span {
+      background: #161b22; border: 1px solid #21262d; border-radius: 20px;
+      padding: 0.3rem 0.8rem; font-size: 0.8rem; color: #8b949e
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.8rem }
+      .features { grid-template-columns: 1fr }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Omni-Router</h1>
+      <p>Multi-provider AI chat assistant with smart routing, quota management, debate mode, and a code agent — all running locally as an Electron desktop app.</p>
+      <div class="badges">
+        <img src="https://img.shields.io/badge/platform-Electron-47848F" alt="Electron">
+        <img src="https://img.shields.io/badge/ui-React-61DAFB" alt="React">
+        <img src="https://img.shields.io/badge/server-Express-000000" alt="Express">
+        <img src="https://img.shields.io/badge/db-SQLite-003B57" alt="SQLite">
+      </div>
+      <div style="margin-top:1.5rem; display:flex; gap:0.8rem; justify-content:center; flex-wrap:wrap">
+        <a class="btn btn-primary" href="https://github.com/mamoonk/omni-router">View on GitHub</a>
+        <a class="btn btn-outline" href="#install">Install Now</a>
+      </div>
+    </header>
+
+    <section>
+      <h2>Features</h2>
+      <div class="features">
+        <div class="feature">
+          <h3>Smart Routing</h3>
+          <p>Routes each message to the best provider based on intent, quota, speed, and failure history.</p>
+        </div>
+        <div class="feature">
+          <h3>20+ Providers</h3>
+          <p>Gemini, OpenAI, Anthropic, Groq, Mistral, Cohere, DeepSeek, and many more.</p>
+        </div>
+        <div class="feature">
+          <h3>Debate Mode</h3>
+          <p>Two AI models discuss and refine each other's answers for higher quality results.</p>
+        </div>
+        <div class="feature">
+          <h3>Code Agent</h3>
+          <p>Reads and modifies source code directly — works on the app itself or any external project.</p>
+        </div>
+        <div class="feature">
+          <h3>Quota Management</h3>
+          <p>Per-provider rate limits (RPM, TPM, daily caps) with a real-time usage dashboard.</p>
+        </div>
+        <div class="feature">
+          <h3>SSE Streaming</h3>
+          <p>Token-by-token streaming with live activity steps showing routing decisions.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Supported Providers</h2>
+      <div class="provider-list">
+        <span>Gemini</span><span>Groq</span><span>Cerebras</span><span>HuggingFace</span>
+        <span>Cloudflare</span><span>Mistral</span><span>Cohere</span><span>DeepSeek</span>
+        <span>Together AI</span><span>Fireworks AI</span><span>OpenRouter</span><span>NVIDIA NIM</span>
+        <span>Perplexity</span><span>xAI Grok</span><span>Eden AI</span><span>SiliconFlow</span>
+        <span>DashScope (Qwen)</span><span>AI21 Labs</span><span>OpenAI</span><span>Anthropic</span>
+        <span>SambaNova</span><span>DeepInfra</span><span>Stability AI</span><span>Replicate</span>
+        <span>Fal.ai</span><span>Pollinations.ai</span>
+      </div>
+    </section>
+
+    <section id="install">
+      <h2>Install</h2>
+      <p style="margin-bottom:1rem; color:#8b949e">Prerequisites: Node.js 18+, npm, and git.</p>
+
+      <div class="platform-tabs">
+        <button class="tab-btn active" data-tab="unix">macOS / Linux</button>
+        <button class="tab-btn" data-tab="windows">Windows</button>
+        <button class="tab-btn" data-tab="manual">Manual</button>
+      </div>
+
+      <div class="tab-content active" id="tab-unix">
+        <pre><code><span class="cmd">curl -fsSL https://raw.githubusercontent.com/mamoonk/omni-router/master/install.sh | bash</span></code></pre>
+      </div>
+
+      <div class="tab-content" id="tab-windows">
+        <pre><code><span class="cmd">iwr -Uri https://raw.githubusercontent.com/mamoonk/omni-router/master/install.ps1 | iex</span></code></pre>
+      </div>
+
+      <div class="tab-content" id="tab-manual">
+        <pre><code><span class="comment"># Clone the repo</span>
+<span class="cmd">git clone https://github.com/mamoonk/omni-router.git</span>
+<span class="cmd">cd omni-router</span>
+
+<span class="comment"># Install dependencies &amp; build</span>
+<span class="cmd">npm install</span>
+<span class="cmd">npm run build</span>
+
+<span class="comment"># Run in dev mode</span>
+<span class="cmd">npm run dev</span></code></pre>
+      </div>
+    </section>
+
+    <section>
+      <h2>Run</h2>
+      <table style="width:100%; border-collapse:collapse; font-size:0.9rem">
+        <tr><td style="padding:0.5rem 0; border-bottom:1px solid #21262d"><code>npm run dev</code></td><td style="padding:0.5rem 0; border-bottom:1px solid #21262d; color:#8b949e">Electron app with hot-reload</td></tr>
+        <tr><td style="padding:0.5rem 0; border-bottom:1px solid #21262d"><code>npm run build:web && npm run start:web</code></td><td style="padding:0.5rem 0; border-bottom:1px solid #21262d; color:#8b949e">Standalone web server</td></tr>
+        <tr><td style="padding:0.5rem 0; border-bottom:1px solid #21262d"><code>npm run build && npm run preview</code></td><td style="padding:0.5rem 0; border-bottom:1px solid #21262d; color:#8b949e">Production preview</td></tr>
+        <tr><td style="padding:0.5rem 0"><code>npm run dist</code></td><td style="padding:0.5rem 0; color:#8b949e">Package distributable (DMG/AppImage/EXE)</td></tr>
+      </table>
+    </section>
+
+    <footer class="footer">
+      <a href="https://github.com/mamoonk/omni-router">mamoonk/omni-router</a> &mdash; MIT License
+    </footer>
+  </div>
+
+  <script>
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'))
+        btn.classList.add('active')
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active')
+      })
+    })
+  </script>
+</body>
+</html>
