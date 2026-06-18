@@ -90,11 +90,33 @@
     .footer { text-align: center; padding-top: 2rem; color: #8b949e; font-size: 0.9rem }
     .footer a { color: #58a6ff; text-decoration: none }
 
-    .provider-list { display: flex; flex-wrap: wrap; gap: 0.5rem }
+    .provider-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem }
     .provider-list span {
       background: #161b22; border: 1px solid #21262d; border-radius: 20px;
       padding: 0.3rem 0.8rem; font-size: 0.8rem; color: #8b949e
     }
+
+    .matrix-wrap { overflow-x: auto }
+    .matrix { width: 100%; border-collapse: collapse; font-size: 0.8rem }
+    .matrix th, .matrix td { padding: 0.5rem 0.6rem; text-align: center; border-bottom: 1px solid #21262d; white-space: nowrap }
+    .matrix th { position: sticky; top: 0; background: #0d1117; color: #8b949e; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px }
+    .matrix td:first-child { text-align: left; font-weight: 600; color: #f0f6fc }
+    .matrix td:nth-child(2) { font-size: 0.75rem; color: #8b949e; text-align: right }
+    .matrix tr:hover td { background: #161b22 }
+    .matrix .y { color: #3fb950; font-weight: 700 }
+    .matrix .n { color: #30363d }
+
+    .keys-tip {
+      background: linear-gradient(135deg, #0d1b2a 0%, #161b22 100%);
+      border: 2px solid #d29922; border-radius: 12px; padding: 1.5rem 2rem; margin: 2rem 0;
+      box-shadow: 0 0 25px rgba(210,153,34,.1)
+    }
+    .keys-tip h2 { font-size: 1.1rem; color: #f0f6fc; margin-bottom: 0.5rem; border: none; padding: 0 }
+    .keys-tip p { font-size: 0.9rem; color: #8b949e; line-height: 1.6 }
+    .keys-tip ol { margin: 0.8rem 0 0 1.2rem; font-size: 0.9rem; color: #c9d1d9 }
+    .keys-tip ol li { padding: 0.3rem 0 }
+    .keys-tip ol li strong { color: #f0f6fc }
+    .keys-tip code { background: #0d1117; padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.82rem; color: #ffa657 }
 
     @media (max-width: 600px) {
       header h1 { font-size: 1.8rem }
@@ -248,17 +270,62 @@
     </section>
 
     <section>
-      <h2>Supported Providers</h2>
-      <div class="provider-list">
-        <span>Gemini</span><span>Groq</span><span>Cerebras</span><span>HuggingFace</span>
-        <span>Cloudflare</span><span>Mistral</span><span>Cohere</span><span>DeepSeek</span>
-        <span>Together AI</span><span>Fireworks AI</span><span>OpenRouter</span><span>NVIDIA NIM</span>
-        <span>Perplexity</span><span>xAI Grok</span><span>Eden AI</span><span>SiliconFlow</span>
-        <span>DashScope (Qwen)</span><span>AI21 Labs</span><span>OpenAI</span><span>Anthropic</span>
-        <span>SambaNova</span><span>DeepInfra</span><span>Stability AI</span><span>Replicate</span>
-        <span>Fal.ai</span><span>Pollinations.ai</span>
+      <h2>Provider Matrix</h2>
+      <p style="color:#8b949e; font-size:0.9rem; margin-bottom:1rem">Capabilities across all 28 supported providers.</p>
+      <div class="matrix-wrap">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th>Provider</th><th>Context</th><th title="Function calling / tool use">🔧 Tools</th><th title="Vision / image input">👁️ Vision</th><th title="Image generation">🎨 Image</th><th title="Code generation">💻 Code</th><th title="Creative writing">✍️ Creative</th><th title="Long document handling">📄 Long</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Gemini</td><td>1M</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+            <tr><td>OpenAI</td><td>128K</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>Anthropic</td><td>200K</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>xAI Grok</td><td>131K</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>DeepSeek</td><td>128K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>NVIDIA NIM</td><td>262K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>Groq</td><td>131K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>Cohere</td><td>128K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td><td class="y">✓</td></tr>
+            <tr><td>Mistral</td><td>32K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td></tr>
+            <tr><td>Together AI</td><td>131K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>Fireworks AI</td><td>131K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>OpenRouter</td><td>131K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>Cerebras</td><td>128K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>HuggingFace</td><td>131K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>Cloudflare</td><td>131K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td></tr>
+            <tr><td>Perplexity</td><td>200K</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td></tr>
+            <tr><td>Eden AI</td><td>128K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>SiliconFlow</td><td>32K</td><td class="y">✓</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>DashScope (Qwen)</td><td>1M</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+            <tr><td>AI21 Labs</td><td>256K</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+            <tr><td>SambaNova</td><td>16K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+            <tr><td>DeepInfra</td><td>131K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>Volcengine</td><td>32K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>Zhipu AI (GLM)</td><td>128K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>Baidu Qianfan</td><td>8K</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>Moonshot (Kimi)</td><td>128K</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td><td class="y">✓</td></tr>
+            <tr><td>Stability AI</td><td>4K</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>Replicate</td><td>4K</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>Fal.ai</td><td>4K</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td></tr>
+            <tr><td>Pollinations</td><td>4K</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
+
+    <div class="keys-tip">
+      <h2>🔑 Getting API Keys</h2>
+      <p>Omni-Router supports 28 providers — most require a free API key. The quickest way to get started:</p>
+      <ol>
+        <li><strong>Create an account</strong> with any email (Gmail, Outlook, etc.) — the web version uses email login</li>
+        <li>Sign up for API keys at each provider's website (Gemini, OpenAI, Groq, etc. — most offer free tiers)</li>
+        <li><strong>Log in</strong> to Omni-Router and paste your keys in <strong>Settings → API Keys</strong></li>
+        <li>That's it — start chatting! The router automatically selects the best provider for each message.</li>
+      </ol>
+      <p style="margin-top:0.8rem; font-size:0.85rem; color:#8b949e">💡 Tip: Start with <strong>Gemini</strong> (free tier, 1M context, vision, image gen) and <strong>Groq</strong> (free tier, fast inference) — no credit card needed.</p>
+    </div>
 
 
 
