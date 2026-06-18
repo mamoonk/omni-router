@@ -33,6 +33,16 @@ jobs:
         with:
           node-version: 22
 
+      - name: Set up Python (macOS/Linux)
+        if: runner.os != 'Windows'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Visual Studio (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Install dependencies
         run: npm ci
 
@@ -40,6 +50,7 @@ jobs:
         run: npm run ${{ matrix.dist_cmd }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Upload artifacts
         uses: softprops/action-gh-release@v2
