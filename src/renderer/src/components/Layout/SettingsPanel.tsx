@@ -101,7 +101,7 @@ export function SettingsPanel({ serverPort, settings, onUpdate }: Props) {
   const configuredCount = Object.values(keyStatuses).filter(Boolean).length
 
   return (
-    <div className="p-6 overflow-y-auto h-full max-w-3xl">
+    <div className="p-6 overflow-y-auto h-full max-w-3xl md:max-w-3xl w-full">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold">Settings</h2>
         {activeTab === 'keys' && (

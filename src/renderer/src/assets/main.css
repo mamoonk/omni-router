@@ -13,6 +13,22 @@
 body {
   @apply bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 m-0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Prevent pull-to-refresh on mobile PWA */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safe area insets for notched phones */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-left { padding-left: env(safe-area-inset-left); }
+  .safe-right { padding-right: env(safe-area-inset-right); }
+}
+
+/* Bottom nav safe area */
+.mobile-nav {
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
 }
 
 /* Shimmering "thinking" status text, à la Claude desktop. */
@@ -51,4 +67,18 @@ body {
   background-clip: text;
   color: transparent;
   animation: status-shimmer 2.2s linear infinite;
+}
+
+/* PWA — register service worker */
+@media (display-mode: standalone), (display-mode: minimal-ui) {
+  body { -webkit-user-select: none; user-select: none; }
+}
+
+/* Hide desktop-only elements on mobile, and vice versa */
+@media (max-width: 767px) {
+  .desktop-only { display: none !important; }
+}
+
+@media (min-width: 768px) {
+  .mobile-only { display: none !important; }
 }

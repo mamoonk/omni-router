@@ -1,15 +1,42 @@
 {
-  "name": "omni-router",
+  "name": "@mamoonk/omni-router",
   "productName": "Omni-Router",
   "version": "1.0.0",
   "description": "Multi-provider AI chat router with smart quota management",
-  "author": "Omni-Router <omni-router@example.com>",
+  "author": "mamoonk <mamoonk@gmail.com>",
+  "license": "MIT",
   "main": "./out/main/index.js",
+  "bin": {
+    "omni-router": "./bin/omni-router.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mamoonk/omni-router.git"
+  },
+  "homepage": "https://github.com/mamoonk/omni-router#readme",
+  "bugs": {
+    "url": "https://github.com/mamoonk/omni-router/issues"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "files": [
+    "bin/",
+    "out/",
+    "src/web/",
+    "src/main/server/",
+    "shared/",
+    "public/",
+    "tsconfig.json",
+    "electron.vite.config.ts",
+    "tailwind.config.js",
+    "postcss.config.js"
+  ],
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "node -e \"if(require('fs').existsSync('node_modules/electron')){require('child_process').execSync('electron-builder install-app-deps',{stdio:'inherit'})}\"",
     "lint": "tsc --noEmit",
     "clean": "node -e \"require('fs').rmSync('release', {recursive:true, force:true})\"",
     "dist": "npm run clean && npm run build && electron-builder",
@@ -20,21 +47,27 @@
     "start:web": "tsx src/web/server.ts"
   },
   "dependencies": {
-    "@tailwindcss/typography": "^0.5.20",
-    "bcrypt": "^6.0.0",
-    "better-sqlite3": "^11.0.0",
-    "connect-sqlite3": "^0.9.16",
-    "dotenv": "^16.6.1",
-    "express-session": "^1.19.0",
-    "highlight.js": "^11.11.1",
-    "react-markdown": "^10.1.0",
-    "rehype-raw": "^7.0.0",
-    "remark-gfm": "^4.0.1"
-  },
-  "devDependencies": {
     "@anthropic-ai/sdk": "^0.30.0",
     "@google/generative-ai": "^0.21.0",
     "@mistralai/mistralai": "^1.0.0",
+    "@tailwindcss/typography": "^0.5.20",
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^11.0.0",
+    "cohere-ai": "^7.0.0",
+    "connect-sqlite3": "^0.9.16",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.0",
+    "express-session": "^1.19.0",
+    "highlight.js": "^11.11.1",
+    "openai": "^4.70.0",
+    "react-markdown": "^10.1.0",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
+    "tsx": "^4.22.4",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
     "@tanstack/react-query": "^5.60.0",
     "@types/bcrypt": "^6.0.0",
     "@types/better-sqlite3": "^7.6.0",
@@ -47,20 +80,14 @@
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react": "^4.3.0",
     "autoprefixer": "^10.4.0",
-    "cohere-ai": "^7.0.0",
-    "cors": "^2.8.5",
     "electron": "^33.0.0",
     "electron-builder": "^25.0.0",
     "electron-vite": "^2.3.0",
-    "express": "^4.21.0",
     "lucide-react": "^0.460.0",
-    "openai": "^4.70.0",
-    "postcss": "^8.4.0",
+    "postcss": "^10.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^3.4.0",
-    "tsx": "^4.22.4",
-    "typescript": "^5.6.0",
-    "uuid": "^10.0.0"
+    "typescript": "^5.6.0"
   }
 }

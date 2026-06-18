@@ -1,0 +1,10 @@
+node_modules
+release
+.git
+.github
+docs
+wiki
+out
+data
+*.log
+npm-debug.log*

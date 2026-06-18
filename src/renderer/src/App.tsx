@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { MessageSquare, BarChart3, Settings as SettingsIcon, LogOut } from 'lucide-react'
 import { Header } from './components/Layout/Header'
 import { Sidebar } from './components/Layout/Sidebar'
 import { ChatInterface } from './components/Chat/ChatInterface'
@@ -12,6 +13,64 @@ type View = 'chat' | 'code' | 'dashboard' | 'settings'
 
 const isElectron = typeof window !== 'undefined' && !!window.electronAPI
 
+function MobileNav({
+  view,
+  onViewChange
+}: {
+  view: View
+  onViewChange: (v: View) => void
+}) {
+  const isWeb = !isElectron
+  return (
+    <nav className="mobile-only mobile-nav flex items-center justify-around border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shrink-0">
+      <button
+        onClick={() => onViewChange('chat')}
+        className={`flex flex-col items-center gap-0.5 py-2 px-4 text-xs font-medium transition-colors ${
+          view === 'chat'
+            ? 'text-blue-500 dark:text-blue-400'
+            : 'text-gray-500 dark:text-gray-400'
+        }`}
+      >
+        <MessageSquare size={20} />
+        Chat
+      </button>
+      <button
+        onClick={() => onViewChange('dashboard')}
+        className={`flex flex-col items-center gap-0.5 py-2 px-4 text-xs font-medium transition-colors ${
+          view === 'dashboard'
+            ? 'text-blue-500 dark:text-blue-400'
+            : 'text-gray-500 dark:text-gray-400'
+        }`}
+      >
+        <BarChart3 size={20} />
+        Usage
+      </button>
+      <button
+        onClick={() => onViewChange('settings')}
+        className={`flex flex-col items-center gap-0.5 py-2 px-4 text-xs font-medium transition-colors ${
+          view === 'settings'
+            ? 'text-blue-500 dark:text-blue-400'
+            : 'text-gray-500 dark:text-gray-400'
+        }`}
+      >
+        <SettingsIcon size={20} />
+        Settings
+      </button>
+      {isWeb && (
+        <button
+          onClick={() => {
+            fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).then(() => window.location.reload())
+          }}
+          className="flex flex-col items-center gap-0.5 py-2 px-4 text-xs font-medium text-gray-500 dark:text-gray-400 transition-colors"
+        >
+          <LogOut size={20} />
+          Logout
+        </button>
+      )}
+    </nav>
+  )
+}
+
 export default function App() {
   const [serverPort, setServerPort] = useState(0)
   const [authChecked, setAuthChecked] = useState(isElectron)
@@ -21,6 +80,7 @@ export default function App() {
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
   const [refreshSignal, setRefreshSignal] = useState(0)
+  const [mobileView, setMobileView] = useState<View>('chat')
 
   const { settings, updateSettings } = useSettings(serverPort)
 
@@ -32,8 +92,6 @@ export default function App() {
         window.electronAPI.onServerPort((p) => setServerPort(p))
         return
       }
-
-      // Web build: no port discovery needed (same-origin); gate on the session instead.
       try {
         const res = await fetch('/api/auth/me', { credentials: 'include' })
         if (res.ok) {
@@ -52,20 +110,25 @@ export default function App() {
     document.documentElement.classList.toggle('dark', settings.darkMode)
   }, [settings?.darkMode])
 
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {})
+    }
+  }, [])
+
   const OVERLAY_VIEWS: View[] = ['dashboard', 'settings']
 
   const handleViewChange = useCallback((next: View) => {
     setView((current) => {
-      // Toggle: clicking the same overlay view again returns to the previous content view
       if (OVERLAY_VIEWS.includes(next) && current === next) {
         return prevView
       }
-      // Moving from a content view to an overlay — remember where we came from
       if (OVERLAY_VIEWS.includes(next) && !OVERLAY_VIEWS.includes(current)) {
         setPrevView(current)
       }
       return next
     })
+    setMobileView(next)
   }, [prevView])
 
   const onNewChat = useCallback(() => {
@@ -103,27 +166,10 @@ export default function App() {
     )
   }
 
-  return (
-    <div className="flex h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-      <Sidebar
-        serverPort={serverPort}
-        currentConversationId={currentConversationId}
-        onSelectConversation={setCurrentConversationId}
-        onNewChat={onNewChat}
-        selectedProjectId={selectedProjectId}
-        onSelectProject={setSelectedProjectId}
-        refreshSignal={refreshSignal}
-        view={view}
-        onViewChange={handleViewChange}
-      />
-      <main className="flex-1 flex flex-col min-w-0">
-        <Header
-          view={view}
-          onViewChange={handleViewChange}
-          darkMode={settings?.darkMode ?? false}
-          onToggleDarkMode={() => updateSettings({ darkMode: !(settings?.darkMode ?? false) })}
-        />
-        {view === 'chat' && (
+  const renderContent = (v: View) => {
+    switch (v) {
+      case 'chat':
+        return (
           <ChatInterface
             serverPort={serverPort}
             conversationId={currentConversationId}
@@ -136,25 +182,61 @@ export default function App() {
             onRoutingStrategyChange={(s) => updateSettings({ routingStrategy: s })}
             onViewChange={handleViewChange}
           />
-        )}
-        {view === 'code' && isElectron && (
+        )
+      case 'code':
+        return isElectron ? (
           <CodeInterface
             serverPort={serverPort}
             onConversationSaved={onConversationSaved}
             projectId={selectedProjectId}
           />
-        )}
-        {view === 'dashboard' && (
-          <UsageDashboard serverPort={serverPort} />
-        )}
-        {view === 'settings' && (
+        ) : null
+      case 'dashboard':
+        return <UsageDashboard serverPort={serverPort} />
+      case 'settings':
+        return (
           <SettingsPanel
             serverPort={serverPort}
             settings={settings}
             onUpdate={updateSettings}
           />
-        )}
-      </main>
-    </div>
+        )
+    }
+  }
+
+  return (
+    <>
+      {/* Mobile layout */}
+      <div className="mobile-only flex flex-col h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 safe-top">
+        <div className="flex-1 overflow-hidden">
+          {renderContent(mobileView)}
+        </div>
+        <MobileNav view={mobileView} onViewChange={handleViewChange} />
+      </div>
+
+      {/* Desktop layout */}
+      <div className="desktop-only flex h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+        <Sidebar
+          serverPort={serverPort}
+          currentConversationId={currentConversationId}
+          onSelectConversation={setCurrentConversationId}
+          onNewChat={onNewChat}
+          selectedProjectId={selectedProjectId}
+          onSelectProject={setSelectedProjectId}
+          refreshSignal={refreshSignal}
+          view={view}
+          onViewChange={handleViewChange}
+        />
+        <main className="flex-1 flex flex-col min-w-0">
+          <Header
+            view={view}
+            onViewChange={handleViewChange}
+            darkMode={settings?.darkMode ?? false}
+            onToggleDarkMode={() => updateSettings({ darkMode: !(settings?.darkMode ?? false) })}
+          />
+          {renderContent(view)}
+        </main>
+      </div>
+    </>
   )
 }

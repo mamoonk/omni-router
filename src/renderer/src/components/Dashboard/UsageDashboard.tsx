@@ -43,7 +43,7 @@ export function UsageDashboard({ serverPort }: Props) {
       />
 
       <h3 className="text-lg font-medium mb-3 mt-8">Provider Quota</h3>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         {quotaStatuses.map((qs) => (
           <QuotaBar key={qs.provider} status={qs} />
         ))}
