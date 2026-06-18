@@ -428,17 +428,14 @@ export function SettingsPanel({ serverPort, settings, onUpdate }: Props) {
           <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6">
             <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">About the Author</h3>
             <div className="flex items-start gap-4">
-              <div className="shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                MK
+              <div className="shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                KG
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100">Mamoon Khan</h4>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Software Engineer &amp; AI Developer</p>
+                <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100">Khan-G</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Collective of Strategists, Creators &amp; Problem-Solvers</p>
                 <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                  Mamoon Khan is the creator and sole maintainer of Omni-Router. With a passion for making AI accessible,
-                  he built Omni-Router to eliminate the complexity of managing multiple AI providers — giving everyone
-                  free access to the best models through a single, unified interface. The project is open-source under
-                  the MIT license and welcomes community contributions.
+                  We are a collective of forward-thinking strategists, creators, and problem-solvers. Our strength lies in our collaborative synergy, allowing us to leverage our collective talent to push boundaries and deliver high-impact value.
                 </p>
                 <div className="flex flex-wrap gap-3 mt-4">
                   <a href="https://github.com/mamoonk" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline">
@@ -456,7 +453,7 @@ export function SettingsPanel({ serverPort, settings, onUpdate }: Props) {
           </div>
 
           <p className="text-center text-xs text-gray-400 dark:text-gray-600 pt-2">
-            Omni-Router &copy; 2026 Mamoon Khan &middot; MIT License &middot; Made with care for the open-source community
+            Omni-Router &copy; 2026 Khan-G &middot; MIT License &middot; Built by a collective, for everyone
           </p>
         </section>
       )}
