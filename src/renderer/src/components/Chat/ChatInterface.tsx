@@ -74,31 +74,26 @@ export function ChatInterface({
           </div>
         )}
         {messages.length === 0 && (
-          <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-600 px-4">
-            <div className="text-center max-w-md">
-              <h2 className="text-2xl font-semibold mb-3 text-gray-700 dark:text-gray-300">Welcome to Omni-Router</h2>
-              <p className="text-sm mb-4 text-gray-500 dark:text-gray-400">
-                You can start chatting right now — Omni-Router includes a free built-in provider so you can play around without any setup.
-              </p>
-              <div className="rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-900/20 p-4 text-left">
-                <p className="text-sm font-medium text-blue-700 dark:text-blue-300 mb-2">
-                  Want millions of tokens for free?
-                </p>
-                <p className="text-xs text-blue-600 dark:text-blue-400 leading-relaxed">
-                  Add your own API keys in <strong>Settings → API Keys</strong>. Most providers offer free tiers —
-                  Gemini gives 60 req/min with 1M context, Groq offers fast free inference, and Cloudflare gives 10M tokens/day.
-                  The more keys you add, the more providers Omni-Router can route to, giving you better answers and higher limits.
-                </p>
-                <button
-                  onClick={() => onViewChange('settings')}
-                  className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 transition-colors"
-                >
-                  Go to Settings →
-                </button>
+          <div className="flex justify-start">
+            <div className="max-w-[85%] rounded-2xl rounded-bl-sm bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 py-3">
+              <div className="prose prose-sm dark:prose-invert max-w-none">
+                <p className="font-semibold text-base mb-2">Welcome to Omni-Router 👋</p>
+                <p>You can start chatting right now — a free built-in provider lets you play around with zero setup.</p>
+                <p className="mt-3 mb-1 font-semibold">Want millions of tokens for free? 🔑</p>
+                <p>Add your own API keys in <strong>Settings → API Keys</strong>. Most providers offer free tiers:</p>
+                <ul className="mt-1 mb-2">
+                  <li><strong>Gemini</strong> — 60 req/min, 1M context, no credit card</li>
+                  <li><strong>Groq</strong> — Fast free inference, no credit card</li>
+                  <li><strong>Cloudflare</strong> — 10M tokens/day, free</li>
+                </ul>
+                <p>The more keys you add, the more providers Omni-Router can route to — giving you better answers and way higher limits.</p>
               </div>
-              <p className="text-xs mt-4 text-gray-400 dark:text-gray-600">
-                Automatically routes across 28 AI providers · Smart, cheapest, fastest &amp; round-robin strategies
-              </p>
+              <button
+                onClick={() => onViewChange('settings')}
+                className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 transition-colors"
+              >
+                Go to Settings →
+              </button>
             </div>
           </div>
         )}
