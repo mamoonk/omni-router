@@ -58,7 +58,7 @@ export function ChatStatusBar({ serverPort, routingStrategy, onRoutingStrategyCh
   const capacityColor = capacityPct > 50 ? 'text-green-500' : capacityPct > 15 ? 'text-amber-500' : 'text-red-500'
 
   return (
-    <div className="flex items-center gap-4 px-4 py-1.5 text-xs text-gray-400 dark:text-gray-500 border-t border-gray-100 dark:border-gray-800">
+    <div className="hidden md:flex items-center gap-4 px-4 py-1.5 text-xs text-gray-400 dark:text-gray-500 border-t border-gray-100 dark:border-gray-800">
       <span className="flex items-center gap-1">
         <Coins size={12} />
         {(totalTokens / 1000).toFixed(0)}K tokens
