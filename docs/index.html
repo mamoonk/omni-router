@@ -47,10 +47,18 @@
     }
     .install-hero .tab-row .tab-btn.active { background: #238636; border-color: #238636; color: #fff }
 
-    .features { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem }
-    .feature { background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 1.2rem }
+    .features { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1rem }
+    .feature {
+      background: #161b22; border: 1px solid #21262d; border-radius: 10px; padding: 1.4rem;
+      transition: border-color .2s, box-shadow .2s; position: relative; overflow: hidden
+    }
+    .feature:hover { border-color: #58a6ff; box-shadow: 0 0 20px rgba(88,166,255,.08) }
+    .feature .icon { font-size: 1.5rem; margin-bottom: 0.5rem; display: inline-block }
     .feature h3 { font-size: 1rem; color: #f0f6fc; margin-bottom: 0.3rem }
-    .feature p { font-size: 0.9rem; color: #8b949e }
+    .feature p { font-size: 0.88rem; color: #8b949e; line-height: 1.5 }
+    .feature ul { list-style: none; margin-top: 0.5rem; font-size: 0.82rem; color: #8b949e }
+    .feature ul li::before { content: '▸ '; color: #58a6ff }
+    .feature ul li { padding: 0.1rem 0 }
 
     .tab-content { display: none }
     .tab-content.active { display: block }
@@ -130,28 +138,103 @@
       <h2>Features</h2>
       <div class="features">
         <div class="feature">
+          <div class="icon">🧠</div>
           <h3>Smart Routing</h3>
-          <p>Routes each message to the best provider based on intent, quota, speed, and failure history.</p>
+          <p>Four routing strategies decide where each message goes:</p>
+          <ul>
+            <li><strong>Smart</strong> — Scores providers by intent fitness, quota, speed, and failure history</li>
+            <li><strong>Cheapest</strong> — Prioritizes lower-tier providers to minimize cost</li>
+            <li><strong>Fastest</strong> — Prioritizes low-latency providers</li>
+            <li><strong>Round Robin</strong> — Cycles evenly through all available providers</li>
+          </ul>
         </div>
+
         <div class="feature">
+          <div class="icon">🔌</div>
           <h3>20+ Providers</h3>
-          <p>Gemini, OpenAI, Anthropic, Groq, Mistral, Cohere, DeepSeek, and many more.</p>
+          <p>Gemini, OpenAI, Anthropic (Claude), Groq, Mistral, Cohere, DeepSeek, Together AI, Fireworks AI, OpenRouter, NVIDIA NIM, Perplexity, xAI Grok, Eden AI, SiliconFlow, DashScope (Qwen), AI21 Labs, Cerebras, HuggingFace, Cloudflare, SambaNova, DeepInfra, Stability AI, Replicate, Fal.ai, Pollinations.ai and more.</p>
         </div>
+
         <div class="feature">
+          <div class="icon">🎯</div>
+          <h3>Intent Classification</h3>
+          <p>Messages are automatically classified into one of five intents before routing:</p>
+          <ul>
+            <li><strong>Factual</strong> — Questions about facts, definitions, explanations</li>
+            <li><strong>Code</strong> — Programming tasks, function writing, debugging</li>
+            <li><strong>Long Document</strong> — Messages over 4000 characters</li>
+            <li><strong>Creative</strong> — Brainstorming, writing, open-ended tasks</li>
+            <li><strong>Image</strong> — Image generation requests</li>
+          </ul>
+        </div>
+
+        <div class="feature">
+          <div class="icon">🛡️</div>
+          <h3>Provider Failover &amp; Degradation</h3>
+          <p>If a provider returns a 429 (rate-limited) or other error, the router marks it degraded with a configurable cooldown, falls through to the next-best provider, and retries via exponential backoff (30s, 60s, 120s, max 3 attempts).</p>
+        </div>
+
+        <div class="feature">
+          <div class="icon">💬</div>
           <h3>Debate Mode</h3>
-          <p>Two AI models discuss and refine each other's answers for higher quality results.</p>
+          <p>Two AI models discuss and refine each other's answers:</p>
+          <ul>
+            <li><strong>Primary</strong> (answerer) generates an initial response</li>
+            <li><strong>Critic</strong> (reviewer) identifies errors, gaps, and improvements</li>
+            <li><strong>Refinement</strong> round produces the final answer</li>
+          </ul>
         </div>
+
         <div class="feature">
+          <div class="icon">🤖</div>
           <h3>Code Agent</h3>
-          <p>Reads and modifies source code directly — works on the app itself or any external project.</p>
+          <p>Reads and modifies source code directly — works on the app itself or any external project. Scans the codebase, keyword-matches relevant files, injects them as context, and writes changes via structured edit blocks.</p>
         </div>
+
         <div class="feature">
+          <div class="icon">📊</div>
           <h3>Quota Management</h3>
-          <p>Per-provider rate limits (RPM, TPM, daily caps) with a real-time usage dashboard.</p>
+          <p>Per-provider rate limits enforced in-memory with SQLite-backed tracking:</p>
+          <ul>
+            <li><strong>RPM</strong> — Requests Per Minute</li>
+            <li><strong>TPM</strong> — Tokens Per Minute</li>
+            <li><strong>Daily token cap</strong></li>
+            <li>Real-time usage dashboard with quota bars</li>
+          </ul>
         </div>
+
         <div class="feature">
+          <div class="icon">⚡</div>
           <h3>SSE Streaming</h3>
-          <p>Token-by-token streaming with live activity steps showing routing decisions.</p>
+          <p>All chat responses stream token-by-token via Server-Sent Events, showing the provider and model serving the request, activity steps in real time, and debate rounds as they complete.</p>
+        </div>
+
+        <div class="feature">
+          <div class="icon">📦</div>
+          <h3>Response Caching</h3>
+          <p>Identical prompts are cached for 24 hours via SHA-256 hashing — avoids redundant API calls and reduces cost for repeated queries. Configurable toggle in Settings.</p>
+        </div>
+
+        <div class="feature">
+          <div class="icon">✂️</div>
+          <h3>Context Optimization</h3>
+          <p>Two optimization layers keep context within model windows:</p>
+          <ul>
+            <li><strong>Compression</strong> — Normalizes whitespace and strips system prompt boilerplate</li>
+            <li><strong>History Trimming</strong> — Removes least important messages when approaching context limit</li>
+          </ul>
+        </div>
+
+        <div class="feature">
+          <div class="icon">🎨</div>
+          <h3>Image Generation</h3>
+          <p>Gemini's Imagen model is available for text-to-image generation with inline display in chat.</p>
+        </div>
+
+        <div class="feature">
+          <div class="icon">📁</div>
+          <h3>Projects</h3>
+          <p>Organize conversations into named projects. Create, rename, and delete projects with a filterable sidebar.</p>
         </div>
       </div>
     </section>
