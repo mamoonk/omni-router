@@ -40,19 +40,13 @@ function StatusIcon({ status }: { status: ActivityStep['status'] }) {
 
 export function ThinkingTrace({ steps, live }: Props) {
   const hasSteps = !!steps && steps.length > 0
-  const [open, setOpen] = useState(live)
-
-  useEffect(() => {
-    if (live) setOpen(true)
-  }, [live])
+  const [open, setOpen] = useState(false)
 
   if (!hasSteps) return null
 
-  const running = steps!.some((s) => s.status === 'running')
+  const runningStep = steps!.find((s) => s.status === 'running')
   const failed = steps!.filter((s) => s.status === 'fail').length
-  const summary = live || running
-    ? 'Thinking…'
-    : `Worked through ${steps!.length} step${steps!.length === 1 ? '' : 's'}${failed > 0 ? ` · ${failed} failed` : ''}`
+  const currentLabel = runningStep?.label || (live ? 'Thinking…' : `Done · ${steps!.length} step${steps!.length === 1 ? '' : 's'}${failed > 0 ? ` · ${failed} failed` : ''}`)
 
   return (
     <div className="mb-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-800/40 overflow-hidden">
@@ -62,13 +56,13 @@ export function ThinkingTrace({ steps, live }: Props) {
         }}
         className="flex items-center gap-2 w-full px-3 py-2 text-xs font-medium text-left text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
       >
-        {running ? (
+        {runningStep ? (
           <Loader2 size={13} className="animate-spin text-blue-500" />
         ) : (
           <Sparkles size={13} className="text-blue-500" />
         )}
-        <span>{summary}</span>
-        {open ? <ChevronDown size={13} className="ml-auto" /> : <ChevronRight size={13} className="ml-auto" />}
+        <span className="truncate">{currentLabel}</span>
+        {open ? <ChevronDown size={13} className="ml-auto shrink-0" /> : <ChevronRight size={13} className="ml-auto shrink-0" />}
       </button>
       {open && (
         <ol className="px-3 pb-2 pt-0.5 space-y-1.5">
