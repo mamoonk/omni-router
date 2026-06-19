@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: omni-router
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: MYROUTER_DB_PATH
+        value: /opt/render/project/src/data/omni-router.db
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /
+    autoDeploy: true
