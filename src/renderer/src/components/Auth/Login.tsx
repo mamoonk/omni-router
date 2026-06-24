@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { MessageSquare, Brain, Route, Shield, ArrowRight, Loader2, Eye, EyeOff, Sparkles, Zap, Globe } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { MessageSquare, Brain, Route, Shield, ArrowRight, Loader2, Eye, EyeOff, Sparkles, Zap, Globe, Sun, Moon } from 'lucide-react'
 
 interface Props {
   onAuthed: (user: { id: string; email: string; name?: string; avatar?: string }) => void
@@ -14,16 +14,16 @@ const FEATURES = [
 
 const GOOGLE_AVAILABLE = typeof window !== 'undefined' && !!(window as any).__GOOGLE_AUTH_ENABLED__
 
-function GoogleButton({ loading, onClick }: { loading: boolean; onClick: () => void }) {
+function GoogleButton({ loading, onClick, dark }: { loading: boolean; onClick: () => void; dark: boolean }) {
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={loading}
-      className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 group"
+      className={`w-full flex items-center justify-center gap-3 py-3 px-4 rounded-2xl border disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 group ${dark ? 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20' : 'bg-white border-gray-200 hover:bg-gray-50 shadow-sm'}`}
     >
       {loading ? (
-        <Loader2 size={18} className="animate-spin text-gray-400" />
+        <Loader2 size={18} className={`animate-spin ${dark ? 'text-gray-400' : 'text-gray-500'}`} />
       ) : (
         <svg width="18" height="18" viewBox="0 0 48 48" className="shrink-0">
           <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -33,7 +33,7 @@ function GoogleButton({ loading, onClick }: { loading: boolean; onClick: () => v
           <path fill="none" d="M0 0h48v48H0z"/>
         </svg>
       )}
-      <span className="text-sm font-medium text-gray-200 group-hover:text-white transition-colors">
+      <span className={`text-sm font-medium transition-colors ${dark ? 'text-gray-200 group-hover:text-white' : 'text-gray-600 group-hover:text-gray-900'}`}>
         Continue with Google
       </span>
     </button>
@@ -49,6 +49,11 @@ export function Login({ onAuthed }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', dark)
+  }, [dark])
 
   const handleGoogle = () => {
     setGoogleLoading(true)
@@ -83,16 +88,25 @@ export function Login({ onAuthed }: Props) {
   }
 
   return (
-    <div className="min-h-screen flex bg-[#080b14] text-gray-100 overflow-hidden">
+    <div className={`min-h-screen flex overflow-hidden ${dark ? 'bg-[#080b14] text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
       {/* Ambient background */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-900/5 rounded-full blur-[100px]" />
+        <div className={`absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full blur-[120px] ${dark ? 'bg-blue-600/10' : 'bg-blue-400/20'}`} />
+        <div className={`absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full blur-[120px] ${dark ? 'bg-purple-600/10' : 'bg-purple-400/15'}`} />
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-[100px] ${dark ? 'bg-indigo-900/5' : 'bg-indigo-200/30'}`} />
       </div>
 
+      {/* Theme toggle */}
+      <button
+        onClick={() => setDark(!dark)}
+        className={`fixed top-4 right-4 z-50 p-2.5 rounded-xl border transition-all duration-200 ${dark ? 'bg-white/5 border-white/10 hover:bg-white/10 text-gray-400 hover:text-gray-200' : 'bg-white border-gray-200 hover:bg-gray-100 text-gray-500 hover:text-gray-800 shadow-sm'}`}
+        title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+      >
+        {dark ? <Sun size={16} /> : <Moon size={16} />}
+      </button>
+
       {/* Left panel */}
-      <div className="hidden lg:flex lg:w-[55%] flex-col justify-between p-14 relative">
+      <div className={`hidden lg:flex lg:w-[55%] flex-col justify-between p-14 relative ${dark ? '' : 'bg-white/60'}`}>
         {/* Logo */}
         <div className="flex items-center gap-3 relative z-10">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-sm shadow-xl shadow-blue-500/30">
@@ -124,7 +138,7 @@ export function Login({ onAuthed }: Props) {
               return (
                 <div
                   key={f.title}
-                  className="group flex items-start gap-3 p-4 rounded-2xl bg-white/[0.03] border border-white/[0.07] hover:bg-white/[0.06] hover:border-white/[0.12] transition-all duration-300"
+                  className={`group flex items-start gap-3 p-4 rounded-2xl border transition-all duration-300 ${dark ? 'bg-white/[0.03] border-white/[0.07] hover:bg-white/[0.06] hover:border-white/[0.12]' : 'bg-gray-100/80 border-gray-200 hover:bg-gray-200/80'}`}
                 >
                   <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center shrink-0 shadow-lg`}>
                     <Icon size={14} className="text-white" />
@@ -169,7 +183,7 @@ export function Login({ onAuthed }: Props) {
           </div>
 
           {/* Mode tabs */}
-          <div className="flex p-1 rounded-2xl bg-white/[0.04] border border-white/[0.08] mb-8">
+          <div className={`flex p-1 rounded-2xl border mb-8 ${dark ? 'bg-white/[0.04] border-white/[0.08]' : 'bg-gray-100 border-gray-200'}`}>
             {(['login', 'signup'] as const).map((m) => (
               <button
                 key={m}
@@ -177,8 +191,8 @@ export function Login({ onAuthed }: Props) {
                 onClick={() => { setMode(m); setError(null) }}
                 className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ${
                   mode === m
-                    ? 'bg-white/10 text-white shadow-sm'
-                    : 'text-gray-500 hover:text-gray-300'
+                    ? dark ? 'bg-white/10 text-white shadow-sm' : 'bg-white text-gray-900 shadow-sm'
+                    : dark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'
                 }`}
               >
                 {m === 'login' ? 'Sign in' : 'Sign up'}
@@ -187,20 +201,20 @@ export function Login({ onAuthed }: Props) {
           </div>
 
           {/* Google button */}
-          <GoogleButton loading={googleLoading} onClick={handleGoogle} />
+          <GoogleButton loading={googleLoading} onClick={handleGoogle} dark={dark} />
 
           {/* Divider */}
           <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-white/[0.08]" />
-            <span className="text-xs text-gray-600 font-medium">or continue with email</span>
-            <div className="flex-1 h-px bg-white/[0.08]" />
+            <div className={`flex-1 h-px ${dark ? 'bg-white/[0.08]' : 'bg-gray-200'}`} />
+            <span className={`text-xs font-medium ${dark ? 'text-gray-600' : 'text-gray-400'}`}>or continue with email</span>
+            <div className={`flex-1 h-px ${dark ? 'bg-white/[0.08]' : 'bg-gray-200'}`} />
           </div>
 
           {/* Form */}
           <form onSubmit={submit} className="space-y-4">
             {mode === 'signup' && (
               <div>
-                <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-widest">
+                <label className={`block text-xs font-semibold mb-2 uppercase tracking-widest ${dark ? 'text-gray-400' : 'text-gray-500'}`}>
                   Full name
                 </label>
                 <input
@@ -208,13 +222,13 @@ export function Login({ onAuthed }: Props) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Your name"
-                  className="w-full px-4 py-3.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all text-sm"
+                  className={`w-full px-4 py-3.5 rounded-2xl border focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all text-sm ${dark ? 'bg-white/[0.04] border-white/[0.08] text-gray-100 placeholder-gray-600' : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400'}`}
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-widest">
+              <label className={`block text-xs font-semibold mb-2 uppercase tracking-widest ${dark ? 'text-gray-400' : 'text-gray-500'}`}>
                 Email
               </label>
               <input
@@ -223,12 +237,12 @@ export function Login({ onAuthed }: Props) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full px-4 py-3.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all text-sm"
+                className={`w-full px-4 py-3.5 rounded-2xl border focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all text-sm ${dark ? 'bg-white/[0.04] border-white/[0.08] text-gray-100 placeholder-gray-600' : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400'}`}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-widest">
+              <label className={`block text-xs font-semibold mb-2 uppercase tracking-widest ${dark ? 'text-gray-400' : 'text-gray-500'}`}>
                 Password
               </label>
               <div className="relative">
@@ -239,12 +253,12 @@ export function Login({ onAuthed }: Props) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={mode === 'signup' ? 'At least 8 characters' : '••••••••'}
-                  className="w-full px-4 py-3.5 pr-12 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all text-sm"
+                  className={`w-full px-4 py-3.5 pr-12 rounded-2xl border focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all text-sm ${dark ? 'bg-white/[0.04] border-white/[0.08] text-gray-100 placeholder-gray-600' : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400'}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400 transition-colors"
+                  className={`absolute right-4 top-1/2 -translate-y-1/2 transition-colors ${dark ? 'text-gray-600 hover:text-gray-400' : 'text-gray-400 hover:text-gray-600'}`}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -275,14 +289,14 @@ export function Login({ onAuthed }: Props) {
           </form>
 
           {/* Footer note */}
-          <p className="mt-8 text-center text-xs text-gray-600 leading-relaxed">
+          <p className={`mt-8 text-center text-xs leading-relaxed ${dark ? 'text-gray-600' : 'text-gray-400'}`}>
             By continuing, you agree to our{' '}
             <span className="text-gray-400 cursor-default">Terms of Service</span>
             {' '}and{' '}
             <span className="text-gray-400 cursor-default">Privacy Policy</span>.
           </p>
 
-          <div className="mt-6 flex items-center justify-center gap-4 text-xs text-gray-700">
+          <div className={`mt-6 flex items-center justify-center gap-4 text-xs ${dark ? 'text-gray-700' : 'text-gray-400'}`}>
             <div className="flex items-center gap-1.5">
               <Globe size={11} />
               <span>28 providers</span>
