@@ -153,13 +153,37 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
     apiKeyEnv: 'OPENROUTER_API_KEY',
     baseUrl: 'https://openrouter.ai/api/v1',
     models: [
+      { id: 'meta-llama/llama-3.3-70b-instruct:free', displayName: 'Llama 3.3 70B (Free)', contextWindow: 131_072, strengths: ['factual', 'code', 'creative'], capabilities: ['tool_use'] },
+      { id: 'deepseek/deepseek-chat:free', displayName: 'DeepSeek V3 (Free)', contextWindow: 128_000, strengths: ['code', 'factual', 'creative'], capabilities: ['tool_use'] },
+      { id: 'google/gemma-3-27b-it:free', displayName: 'Gemma 3 27B (Free)', contextWindow: 131_072, strengths: ['factual', 'creative'], capabilities: ['tool_use'] },
+      { id: 'qwen/qwen3-235b-a22b:free', displayName: 'Qwen3 235B (Free)', contextWindow: 40_960, strengths: ['code', 'factual', 'creative'], capabilities: ['tool_use'] },
+      { id: 'mistralai/devstral-small:free', displayName: 'Devstral Small (Free)', contextWindow: 131_072, strengths: ['code'], capabilities: ['tool_use'] },
       { id: 'meta-llama/llama-3.3-70b-instruct', displayName: 'Llama 3.3 70B', contextWindow: 131_072, strengths: ['factual', 'code', 'creative'], capabilities: ['tool_use'] },
       { id: 'mistralai/mistral-small-3.1-24b-instruct', displayName: 'Mistral Small 3.1', contextWindow: 32_000, strengths: ['factual', 'code'], capabilities: ['tool_use'] }
     ],
-    rpmLimit: 10,
-    tpmLimit: 100_000,
-    dailyTokenLimit: 100_000,
+    rpmLimit: 20,
+    tpmLimit: 200_000,
+    dailyTokenLimit: 200_000,
     tier: 2,
+    adapter: 'openai-compatible',
+    enabled: true
+  },
+  {
+    name: 'github',
+    displayName: 'GitHub Models',
+    apiKeyEnv: 'GITHUB_TOKEN',
+    baseUrl: 'https://models.inference.ai.azure.com',
+    models: [
+      { id: 'gpt-4o', displayName: 'GPT-4o', contextWindow: 128_000, strengths: ['code', 'creative', 'factual'], capabilities: ['tool_use', 'vision'] },
+      { id: 'gpt-4o-mini', displayName: 'GPT-4o Mini', contextWindow: 128_000, strengths: ['code', 'factual'], capabilities: ['tool_use', 'vision'] },
+      { id: 'Meta-Llama-3.3-70B-Instruct', displayName: 'Llama 3.3 70B', contextWindow: 131_072, strengths: ['factual', 'code', 'creative'], capabilities: ['tool_use'] },
+      { id: 'Phi-4', displayName: 'Phi-4', contextWindow: 16_384, strengths: ['code', 'factual'], capabilities: ['tool_use'] },
+      { id: 'mistral-small', displayName: 'Mistral Small', contextWindow: 32_000, strengths: ['factual', 'code'], capabilities: ['tool_use'] }
+    ],
+    rpmLimit: 15,
+    tpmLimit: 150_000,
+    dailyTokenLimit: 150_000,
+    tier: 1,
     adapter: 'openai-compatible',
     enabled: true
   },
