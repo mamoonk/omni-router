@@ -53,21 +53,30 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
 authRouter.use(passport.initialize())
 
 // Google OAuth — redirects to Google consent screen
-authRouter.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }))
+authRouter.get('/google', (req, res, next) => {
+  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+    res.status(503).json({ error: 'Google login is not configured on this server' })
+    return
+  }
+  passport.authenticate('google', { scope: ['profile', 'email'], session: false })(req, res, next)
+})
 
 // Google OAuth — callback after user grants permission
-authRouter.get('/google/callback',
-  passport.authenticate('google', { session: false, failureRedirect: '/?error=google_auth_failed' }),
-  (req, res) => {
-    const user = req.user as any
-    if (!user) {
+authRouter.get('/google/callback', (req, res, next) => {
+  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+    res.redirect('/?error=google_not_configured')
+    return
+  }
+  passport.authenticate('google', { session: false, failureRedirect: '/?error=google_auth_failed' }, (err: any, user: any) => {
+    if (err || !user) {
+      console.error('Google OAuth error:', err)
       res.redirect('/?error=google_auth_failed')
       return
     }
     req.session.userId = user.id
-    res.redirect('/')
-  }
-)
+    req.session.save(() => res.redirect('/'))
+  })(req, res, next)
+})
 
 authRouter.post('/signup', async (req, res) => {
   try {
