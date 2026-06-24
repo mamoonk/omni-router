@@ -10,7 +10,10 @@ const SCHEMA = `
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
+  password_hash TEXT,
+  google_id TEXT UNIQUE,
+  name TEXT,
+  avatar TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -145,6 +148,10 @@ export async function initDatabase(path: string): Promise<void> {
   try { db.exec("ALTER TABLE conversations ADD COLUMN user_id TEXT NOT NULL DEFAULT 'local'") } catch {}
   try { db.exec("ALTER TABLE quota_log ADD COLUMN user_id TEXT NOT NULL DEFAULT 'local'") } catch {}
   try { db.exec("ALTER TABLE settings ADD COLUMN user_id TEXT NOT NULL DEFAULT 'local'") } catch {}
+  try { db.exec('ALTER TABLE users ADD COLUMN google_id TEXT') } catch {}
+  try { db.exec('ALTER TABLE users ADD COLUMN name TEXT') } catch {}
+  try { db.exec('ALTER TABLE users ADD COLUMN avatar TEXT') } catch {}
+  try { db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id) WHERE google_id IS NOT NULL') } catch {}
 
   // SQLite can't ALTER a UNIQUE/PRIMARY KEY constraint — a database created before the
   // user_id column existed still has the old single-column constraint even after the
@@ -188,18 +195,27 @@ export async function initDatabase(path: string): Promise<void> {
 
 export const DEFAULT_PROJECT_ID = 'default'
 
-export function createUser(id: string, email: string, passwordHash: string): void {
-  getDb().prepare('INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)').run(id, email, passwordHash)
+export function createUser(id: string, email: string, passwordHash: string | null, opts?: { googleId?: string; name?: string; avatar?: string }): void {
+  getDb().prepare('INSERT INTO users (id, email, password_hash, google_id, name, avatar) VALUES (?, ?, ?, ?, ?, ?)').run(id, email, passwordHash, opts?.googleId || null, opts?.name || null, opts?.avatar || null)
   getDb().prepare("INSERT OR IGNORE INTO projects (id, user_id, name) VALUES (?, ?, 'Default')").run(`default-${id}`, id)
 }
 
-export function getUserByEmail(email: string): { id: string; email: string; passwordHash: string } | null {
-  const row = getDb().prepare('SELECT id, email, password_hash as passwordHash FROM users WHERE email = ?').get(email) as any
+export function getUserByEmail(email: string): { id: string; email: string; passwordHash: string | null; name: string | null; avatar: string | null } | null {
+  const row = getDb().prepare('SELECT id, email, password_hash as passwordHash, name, avatar FROM users WHERE email = ?').get(email) as any
   return row || null
 }
 
-export function getUserById(id: string): { id: string; email: string } | null {
-  const row = getDb().prepare('SELECT id, email FROM users WHERE id = ?').get(id) as any
+export function getUserByGoogleId(googleId: string): { id: string; email: string; name: string | null; avatar: string | null } | null {
+  const row = getDb().prepare('SELECT id, email, name, avatar FROM users WHERE google_id = ?').get(googleId) as any
+  return row || null
+}
+
+export function updateUserGoogle(id: string, googleId: string, name: string, avatar: string): void {
+  getDb().prepare('UPDATE users SET google_id = ?, name = ?, avatar = ? WHERE id = ?').run(googleId, name, avatar, id)
+}
+
+export function getUserById(id: string): { id: string; email: string; name: string | null; avatar: string | null } | null {
+  const row = getDb().prepare('SELECT id, email, name, avatar FROM users WHERE id = ?').get(id) as any
   return row || null
 }
 

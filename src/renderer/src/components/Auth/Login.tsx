@@ -1,34 +1,73 @@
 import { useState } from 'react'
-import { MessageSquare, Brain, Route, Shield, ArrowRight, Loader2 } from 'lucide-react'
+import { MessageSquare, Brain, Route, Shield, ArrowRight, Loader2, Eye, EyeOff, Sparkles, Zap, Globe } from 'lucide-react'
 
 interface Props {
-  onAuthed: (user: { id: string; email: string }) => void
+  onAuthed: (user: { id: string; email: string; name?: string; avatar?: string }) => void
 }
 
 const FEATURES = [
-  { icon: Route, title: 'Smart Routing', desc: '28 AI providers, one interface' },
-  { icon: Brain, title: 'Debate Mode', desc: 'Two models refine each other' },
-  { icon: Shield, title: 'Private', desc: 'Your data stays on your server' },
-  { icon: MessageSquare, title: 'Free Tier', desc: 'Chat without any API keys' },
+  { icon: Route, title: 'Smart Routing', desc: '28 AI providers, one interface', color: 'from-blue-500 to-cyan-500' },
+  { icon: Brain, title: 'Debate Mode', desc: 'Two models refine each other', color: 'from-purple-500 to-pink-500' },
+  { icon: Shield, title: 'Private & Secure', desc: 'Your data stays on your server', color: 'from-green-500 to-emerald-500' },
+  { icon: MessageSquare, title: 'Free Tier', desc: 'Chat without any API keys', color: 'from-orange-500 to-amber-500' },
 ]
+
+const GOOGLE_AVAILABLE = typeof window !== 'undefined' && !!(window as any).__GOOGLE_AUTH_ENABLED__
+
+function GoogleButton({ loading, onClick }: { loading: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={loading}
+      className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 group"
+    >
+      {loading ? (
+        <Loader2 size={18} className="animate-spin text-gray-400" />
+      ) : (
+        <svg width="18" height="18" viewBox="0 0 48 48" className="shrink-0">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          <path fill="none" d="M0 0h48v48H0z"/>
+        </svg>
+      )}
+      <span className="text-sm font-medium text-gray-200 group-hover:text-white transition-colors">
+        Continue with Google
+      </span>
+    </button>
+  )
+}
 
 export function Login({ onAuthed }: Props) {
   const [mode, setMode] = useState<'login' | 'signup'>('login')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
+
+  const handleGoogle = () => {
+    setGoogleLoading(true)
+    window.location.href = '/api/auth/google'
+  }
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setLoading(true)
     try {
+      const body: Record<string, string> = { email, password }
+      if (mode === 'signup' && name.trim()) body.name = name.trim()
+
       const res = await fetch(`/api/auth/${mode}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify(body)
       })
       const data = await res.json()
       if (!res.ok) {
@@ -44,76 +83,138 @@ export function Login({ onAuthed }: Props) {
   }
 
   return (
-    <div className="min-h-screen flex bg-gray-950 text-gray-100">
-      {/* Left panel — branding (hidden on mobile) */}
-      <div className="hidden md:flex md:w-1/2 flex-col justify-between p-12 relative overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-blue-950/30">
-        <div className="absolute top-20 right-10 w-72 h-72 bg-blue-600/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
+    <div className="min-h-screen flex bg-[#080b14] text-gray-100 overflow-hidden">
+      {/* Ambient background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-900/5 rounded-full blur-[100px]" />
+      </div>
 
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/20">
-              OR
-            </div>
-            <span className="text-xl font-bold tracking-tight">Omni-Router</span>
+      {/* Left panel */}
+      <div className="hidden lg:flex lg:w-[55%] flex-col justify-between p-14 relative">
+        {/* Logo */}
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-sm shadow-xl shadow-blue-500/30">
+            OR
           </div>
+          <span className="text-lg font-bold tracking-tight">Omni-Router</span>
+          <span className="ml-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase tracking-wider">Beta</span>
         </div>
 
-        <div className="relative z-10 max-w-md">
-          <h1 className="text-4xl font-bold leading-tight mb-4">
-            Welcome to<br />
-            <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Omni-Router
+        {/* Hero text */}
+        <div className="relative z-10 max-w-lg">
+          <div className="flex items-center gap-2 mb-6">
+            <Sparkles size={14} className="text-blue-400" />
+            <span className="text-xs font-semibold text-blue-400 uppercase tracking-widest">The future of AI chat</span>
+          </div>
+          <h1 className="text-5xl font-black leading-[1.1] mb-6 tracking-tight">
+            One chat.<br />
+            <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              Every AI model.
             </span>
           </h1>
-          <p className="text-gray-400 text-lg leading-relaxed mb-8">
-            One AI chat that routes across 28 providers — automatically picking the best model for every message.
+          <p className="text-gray-400 text-lg leading-relaxed mb-10">
+            Omni-Router intelligently routes your messages across 28 AI providers — automatically selecting the best model for speed, quality, or cost.
           </p>
 
           <div className="grid grid-cols-2 gap-3">
             {FEATURES.map((f) => {
               const Icon = f.icon
               return (
-                <div key={f.title} className="flex items-start gap-3 p-3 rounded-xl bg-gray-900/60 border border-gray-800 backdrop-blur-sm">
-                  <Icon size={18} className="shrink-0 mt-0.5 text-blue-400" />
+                <div
+                  key={f.title}
+                  className="group flex items-start gap-3 p-4 rounded-2xl bg-white/[0.03] border border-white/[0.07] hover:bg-white/[0.06] hover:border-white/[0.12] transition-all duration-300"
+                >
+                  <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center shrink-0 shadow-lg`}>
+                    <Icon size={14} className="text-white" />
+                  </div>
                   <div>
-                    <div className="text-sm font-semibold">{f.title}</div>
-                    <div className="text-xs text-gray-500">{f.desc}</div>
+                    <div className="text-sm font-semibold text-gray-100">{f.title}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{f.desc}</div>
                   </div>
                 </div>
               )
             })}
           </div>
+
+          {/* Stats row */}
+          <div className="mt-10 flex items-center gap-8">
+            {[['28', 'AI Providers'], ['∞', 'Messages'], ['0', 'Data Sold']].map(([val, label]) => (
+              <div key={label}>
+                <div className="text-2xl font-black text-white">{val}</div>
+                <div className="text-xs text-gray-500">{label}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="relative z-10 text-xs text-gray-600">
+        <div className="relative z-10 text-xs text-gray-700">
           &copy; 2026 Khan-G &middot; MIT License
         </div>
       </div>
 
+      {/* Divider */}
+      <div className="hidden lg:block w-px bg-gradient-to-b from-transparent via-white/10 to-transparent my-16" />
+
       {/* Right panel — form */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12">
-        <div className="w-full max-w-sm">
-          {/* Mobile logo (hidden on desktop) */}
-          <div className="md:hidden flex items-center justify-center gap-3 mb-8">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 relative z-10">
+        <div className="w-full max-w-[380px]">
+          {/* Mobile logo */}
+          <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-sm shadow-xl shadow-blue-500/30">
               OR
             </div>
-            <span className="text-xl font-bold tracking-tight">Omni-Router</span>
+            <span className="text-lg font-bold tracking-tight">Omni-Router</span>
           </div>
 
-          <h2 className="text-2xl font-bold mb-1">
-            {mode === 'login' ? 'Welcome back' : 'Create account'}
-          </h2>
-          <p className="text-sm text-gray-500 mb-8">
-            {mode === 'login'
-              ? 'Sign in to continue to Omni-Router'
-              : 'Get started with Omni-Router in seconds'}
-          </p>
+          {/* Mode tabs */}
+          <div className="flex p-1 rounded-2xl bg-white/[0.04] border border-white/[0.08] mb-8">
+            {(['login', 'signup'] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => { setMode(m); setError(null) }}
+                className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ${
+                  mode === m
+                    ? 'bg-white/10 text-white shadow-sm'
+                    : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                {m === 'login' ? 'Sign in' : 'Sign up'}
+              </button>
+            ))}
+          </div>
 
-          <form onSubmit={submit} className="space-y-5">
+          {/* Google button */}
+          <GoogleButton loading={googleLoading} onClick={handleGoogle} />
+
+          {/* Divider */}
+          <div className="flex items-center gap-4 my-6">
+            <div className="flex-1 h-px bg-white/[0.08]" />
+            <span className="text-xs text-gray-600 font-medium">or continue with email</span>
+            <div className="flex-1 h-px bg-white/[0.08]" />
+          </div>
+
+          {/* Form */}
+          <form onSubmit={submit} className="space-y-4">
+            {mode === 'signup' && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-widest">
+                  Full name
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your name"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all text-sm"
+                />
+              </div>
+            )}
+
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wide">
+              <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-widest">
                 Email
               </label>
               <input
@@ -122,27 +223,36 @@ export function Login({ onAuthed }: Props) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+                className="w-full px-4 py-3.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all text-sm"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wide">
+              <label className="block text-xs font-semibold text-gray-400 mb-2 uppercase tracking-widest">
                 Password
               </label>
-              <input
-                type="password"
-                required
-                minLength={8}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 8 characters"
-                className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-800 text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  minLength={8}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={mode === 'signup' ? 'At least 8 characters' : '••••••••'}
+                  className="w-full px-4 py-3.5 pr-12 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/50 transition-all text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </div>
 
             {error && (
-              <div className="text-sm text-red-400 bg-red-950/40 border border-red-900/50 rounded-lg px-4 py-2.5">
+              <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-2xl px-4 py-3">
                 {error}
               </div>
             )}
@@ -150,32 +260,38 @@ export function Login({ onAuthed }: Props) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold transition-all duration-200 shadow-xl shadow-blue-500/20 hover:shadow-blue-500/30 flex items-center justify-center gap-2 text-sm mt-2"
             >
               {loading ? (
-                <Loader2 size={18} className="animate-spin" />
+                <Loader2 size={16} className="animate-spin" />
               ) : (
                 <>
-                  {mode === 'login' ? 'Sign in' : 'Create account'}
-                  <ArrowRight size={18} />
+                  <Zap size={15} />
+                  {mode === 'login' ? 'Sign in to Omni-Router' : 'Create your account'}
+                  <ArrowRight size={15} />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-              className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
-            >
-              {mode === 'login'
-                ? "Don't have an account? "
-                : 'Already have an account? '}
-              <span className="text-blue-400 font-medium">
-                {mode === 'login' ? 'Sign up' : 'Log in'}
-              </span>
-            </button>
+          {/* Footer note */}
+          <p className="mt-8 text-center text-xs text-gray-600 leading-relaxed">
+            By continuing, you agree to our{' '}
+            <span className="text-gray-400 cursor-default">Terms of Service</span>
+            {' '}and{' '}
+            <span className="text-gray-400 cursor-default">Privacy Policy</span>.
+          </p>
+
+          <div className="mt-6 flex items-center justify-center gap-4 text-xs text-gray-700">
+            <div className="flex items-center gap-1.5">
+              <Globe size={11} />
+              <span>28 providers</span>
+            </div>
+            <div className="w-1 h-1 rounded-full bg-gray-700" />
+            <div className="flex items-center gap-1.5">
+              <Shield size={11} />
+              <span>End-to-end encrypted keys</span>
+            </div>
           </div>
         </div>
       </div>
