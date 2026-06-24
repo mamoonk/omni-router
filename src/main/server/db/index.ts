@@ -153,6 +153,23 @@ export async function initDatabase(path: string): Promise<void> {
   try { db.exec('ALTER TABLE users ADD COLUMN avatar TEXT') } catch {}
   try { db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id) WHERE google_id IS NOT NULL') } catch {}
 
+  // Drop the NOT NULL constraint on password_hash so Google OAuth users can be inserted without one.
+  // SQLite can't ALTER a column constraint, so we rebuild the table if the old constraint is present.
+  rebuildTableIfConstraintStale(
+    'users',
+    'password_hash TEXT,',
+    `CREATE TABLE users (
+      id TEXT PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      password_hash TEXT,
+      google_id TEXT,
+      name TEXT,
+      avatar TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )`,
+    'id, email, password_hash, google_id, name, avatar, created_at'
+  )
+
   // SQLite can't ALTER a UNIQUE/PRIMARY KEY constraint — a database created before the
   // user_id column existed still has the old single-column constraint even after the
   // ALTER TABLE above adds the column, so ON CONFLICT(user_id, ...) silently fails to
