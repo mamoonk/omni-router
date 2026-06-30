@@ -2,6 +2,8 @@ import { app } from 'electron'
 import { join } from 'path'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import dotenv from 'dotenv'
+import { encryptSecret, decryptSecret } from './crypto'
+import { logFileModification, logApiKeySave } from './auditLogger'
 
 const ENV_VARS = [
   'GEMINI_API_KEY', 'GROQ_API_KEY', 'MISTRAL_API_KEY', 'COHERE_API_KEY',
@@ -13,17 +15,47 @@ const ENV_VARS = [
   'FALAI_API_KEY', 'VOLCENGINE_API_KEY', 'ZHIPU_API_KEY', 'BAIDU_API_KEY', 'MOONSHOT_API_KEY'
 ]
 
+// Flag to enable/disable encryption (can be configured by user)
+let encryptionEnabled = false
+
 function getEnvPath(): string {
   return join(app.getPath('userData'), '.env')
+}
+
+/**
+ * Check if encryption is enabled for local API keys
+ */
+export function isEncryptionEnabled(): boolean {
+  return encryptionEnabled
+}
+
+/**
+ * Enable or disable encryption for local API keys
+ */
+export function setEncryptionEnabled(enabled: boolean): void {
+  encryptionEnabled = enabled
 }
 
 export function loadEnv(): void {
   const envPath = getEnvPath()
   if (existsSync(envPath)) {
-    const parsed = dotenv.parse(readFileSync(envPath, 'utf-8'))
+    const content = readFileSync(envPath, 'utf-8')
+    const parsed = dotenv.parse(content)
+    
     for (const [key, value] of Object.entries(parsed)) {
       if (!process.env[key]) {
-        process.env[key] = value
+        // Try to decrypt if encryption is enabled and value looks encrypted
+        if (encryptionEnabled && value.startsWith('enc:')) {
+          try {
+            const decrypted = decryptSecret(value.slice(4))
+            process.env[key] = decrypted
+          } catch (error) {
+            console.error(`Failed to decrypt ${key}:`, error)
+            process.env[key] = value
+          }
+        } else {
+          process.env[key] = value
+        }
       }
     }
   }
@@ -37,7 +69,42 @@ export function getApiKeyStatus(): Record<string, boolean> {
   return result
 }
 
-export function saveApiKeys(keys: Record<string, string>): void {
+/**
+ * Migrate existing plain text keys to encrypted format
+ */
+export function migrateToEncrypted(): void {
+  const envPath = getEnvPath()
+  if (!existsSync(envPath)) return
+  
+  const content = readFileSync(envPath, 'utf-8')
+  const parsed = dotenv.parse(content)
+  const needsMigration: Record<string, string> = {}
+  
+  // Find keys that aren't encrypted yet
+  for (const [key, value] of Object.entries(parsed)) {
+    if (ENV_VARS.includes(key) && !value.startsWith('enc:')) {
+      needsMigration[key] = value
+    }
+  }
+  
+  if (Object.keys(needsMigration).length > 0) {
+    // Encrypt and save
+    const encryptedKeys: Record<string, string> = {}
+    for (const [key, value] of Object.entries(needsMigration)) {
+      encryptedKeys[key] = `enc:${encryptSecret(value)}`
+    }
+    
+    // Save encrypted keys without logging (migration is internal)
+    saveApiKeysDirect(encryptedKeys, false)
+    
+    logFileModification('local', envPath, 'ENCRYPT', true, `Migrated ${Object.keys(needsMigration).length} keys to encrypted format`)
+  }
+}
+
+/**
+ * Direct save without audit logging (used internally)
+ */
+function saveApiKeysDirect(keys: Record<string, string>, shouldLog = true): void {
   const envPath = getEnvPath()
 
   let existing = ''
@@ -81,9 +148,49 @@ export function saveApiKeys(keys: Record<string, string>): void {
 
   writeFileSync(envPath, updatedLines.join('\n'), 'utf-8')
 
+  // Update process.env
   for (const [key, value] of Object.entries(keys)) {
     if (value) {
-      process.env[key] = value
+      // Decrypt if encrypted before setting in env
+      if (encryptionEnabled && value.startsWith('enc:')) {
+        try {
+          process.env[key] = decryptSecret(value.slice(4))
+        } catch (error) {
+          console.error(`Failed to decrypt ${key}:`, error)
+          process.env[key] = value
+        }
+      } else {
+        process.env[key] = value
+      }
+    }
+  }
+  
+  if (shouldLog) {
+    logFileModification('local', envPath, 'UPDATE', true, 'Saved API keys')
+  }
+}
+
+export function saveApiKeys(keys: Record<string, string>): void {
+  const envPath = getEnvPath()
+  
+  // Encrypt keys if encryption is enabled
+  const keysToSave: Record<string, string> = {}
+  for (const [key, value] of Object.entries(keys)) {
+    if (value && encryptionEnabled) {
+      // Store with enc: prefix to mark as encrypted
+      keysToSave[key] = `enc:${encryptSecret(value)}`
+    } else {
+      keysToSave[key] = value
+    }
+  }
+
+  // Use the direct save method which handles logging
+  saveApiKeysDirect(keysToSave, true)
+  
+  // Log the save operation for each key
+  for (const [key, value] of Object.entries(keys)) {
+    if (value) {
+      logApiKeySave('local', key, true, { encrypted: encryptionEnabled })
     }
   }
 }

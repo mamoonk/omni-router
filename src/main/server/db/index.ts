@@ -96,6 +96,8 @@ CREATE INDEX IF NOT EXISTS idx_projects_user ON projects(user_id);
 CREATE INDEX IF NOT EXISTS idx_conversations_user ON conversations(user_id);
 `
 
+import { initAuditLogger } from './services/auditLogger'
+
 export function getDb(): Database.Database {
   if (!db) {
     throw new Error('Database not initialized')
@@ -179,6 +181,9 @@ export async function initDatabase(path: string): Promise<void> {
   )
 
   db.exec(INDEXES)
+
+  // Initialize audit logger
+  initAuditLogger(db)
 
   // Every chat belongs to a project: ensure a catch-all "Default" project exists
   // for the local (desktop) user and adopt any previously unfiled conversations into it.
