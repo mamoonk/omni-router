@@ -7,5 +7,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getServerPort: () => ipcRenderer.invoke('get-server-port'),
   openFolder: () => ipcRenderer.invoke('dialog:open-folder'),
   readFile: (filePath: string) => ipcRenderer.invoke('fs:read-file', filePath),
-  writeFile: (filePath: string, content: string) => ipcRenderer.invoke('fs:write-file', filePath, content)
+  writeFile: (filePath: string, content: string) => ipcRenderer.invoke('fs:write-file', filePath, content),
+  saveFile: (content: string, defaultName: string) => ipcRenderer.invoke('dialog:save-file', content, defaultName),
+  openFile: () => ipcRenderer.invoke('dialog:open-file')
 })

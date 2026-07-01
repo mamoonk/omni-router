@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { getSetting, setSetting } from '../db/index'
-import { getApiKeyStatus, saveApiKeys } from '../services/apiKeys'
+import { getApiKeyStatus, saveApiKeys, exportApiKeys } from '../services/apiKeys'
 import type { Settings } from '@shared/types'
 import type { AuthedRequest } from '../middleware/requireAuth'
 
@@ -71,6 +71,30 @@ settingsRouter.get('/keys', (req: AuthedRequest, res) => {
 settingsRouter.put('/keys', (req: AuthedRequest, res) => {
   try {
     const keys = req.body as Record<string, string>
+    saveApiKeys(req.userId!, keys)
+    const statuses = getApiKeyStatus(req.userId!)
+    res.json(statuses)
+  } catch (err: any) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+settingsRouter.get('/keys/export', (req: AuthedRequest, res) => {
+  try {
+    const keys = exportApiKeys(req.userId!)
+    const json = JSON.stringify(keys)
+    const base64 = Buffer.from(json).toString('base64')
+    res.json({ data: base64 })
+  } catch (err: any) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+settingsRouter.post('/keys/import', (req: AuthedRequest, res) => {
+  try {
+    const { data } = req.body as { data: string }
+    const json = Buffer.from(data, 'base64').toString('utf-8')
+    const keys = JSON.parse(json) as Record<string, string>
     saveApiKeys(req.userId!, keys)
     const statuses = getApiKeyStatus(req.userId!)
     res.json(statuses)

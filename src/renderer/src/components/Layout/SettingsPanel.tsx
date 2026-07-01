@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ExternalLink, Eye, EyeOff, Save, CheckCircle, Key, Bot, Sliders, HelpCircle, Github, BookOpen, Mail, Heart, Globe } from 'lucide-react'
+import { ExternalLink, Eye, EyeOff, Save, CheckCircle, Key, Bot, Sliders, HelpCircle, Github, BookOpen, Mail, Heart, Globe, Download, Upload } from 'lucide-react'
 import { ApiClient } from '../../lib/api'
 import type { Settings } from '@shared/types'
 
@@ -99,6 +99,51 @@ export function SettingsPanel({ serverPort, settings, onUpdate }: Props) {
     })
   }
 
+  const handleExport = async () => {
+    try {
+      const api = new ApiClient(serverPort)
+      const base64 = await api.exportApiKeys()
+      if (window.electronAPI) {
+        await window.electronAPI.saveFile(base64, 'myrouter-keys.json')
+      } else {
+        const blob = new Blob([base64], { type: 'application/json' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'myrouter-keys.json'
+        a.click()
+        URL.revokeObjectURL(url)
+      }
+    } catch { /* ignore */ }
+  }
+
+  const handleImport = async () => {
+    let content: string | null = null
+    if (window.electronAPI) {
+      content = await window.electronAPI.openFile()
+    } else {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.json'
+      content = await new Promise((resolve) => {
+        input.onchange = async () => {
+          const file = input.files?.[0]
+          if (file) resolve(await file.text())
+          else resolve(null)
+        }
+        input.click()
+      })
+    }
+    if (!content) return
+    try {
+      const api = new ApiClient(serverPort)
+      const updated = await api.importApiKeys(content.trim())
+      setKeyStatuses(updated)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch { /* ignore */ }
+  }
+
   const configuredCount = Object.values(keyStatuses).filter(Boolean).length
 
   return (
@@ -115,6 +160,22 @@ export function SettingsPanel({ serverPort, settings, onUpdate }: Props) {
                 <CheckCircle size={14} /> Saved
               </span>
             )}
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title="Export keys to file"
+            >
+              <Download size={14} />
+              Export
+            </button>
+            <button
+              onClick={handleImport}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title="Import keys from file"
+            >
+              <Upload size={14} />
+              Import
+            </button>
             <button
               onClick={handleSave}
               disabled={!hasChanges || saving}

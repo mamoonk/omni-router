@@ -37,6 +37,22 @@ export function saveApiKeys(userId: string, keys: Record<string, string>): void 
   }
 }
 
+export function exportApiKeys(userId: string): Record<string, string> {
+  const keys: Record<string, string> = {}
+  if (userId === LOCAL_USER_ID) {
+    for (const config of PROVIDER_CONFIGS) {
+      const value = process.env[config.apiKeyEnv]
+      if (value) keys[config.apiKeyEnv] = value
+    }
+  } else {
+    for (const config of PROVIDER_CONFIGS) {
+      const encrypted = getUserApiKeyEncrypted(userId, config.apiKeyEnv)
+      if (encrypted) keys[config.apiKeyEnv] = decryptSecret(encrypted)
+    }
+  }
+  return keys
+}
+
 /** Resolves the actual secret for a given provider's `apiKeyEnv`, or undefined if not set. */
 export function resolveApiKey(userId: string, apiKeyEnv: string): string | undefined {
   if (userId === LOCAL_USER_ID) return process.env[apiKeyEnv]

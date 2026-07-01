@@ -23,6 +23,23 @@ async function createWindow() {
     const result = await dialog.showOpenDialog(mainWindow!, { properties: ['openDirectory', 'createDirectory'] })
     return result.canceled ? null : result.filePaths[0]
   })
+  ipcMain.handle('dialog:save-file', async (_event, content: string, defaultName: string) => {
+    const result = await dialog.showSaveDialog(mainWindow!, {
+      defaultPath: defaultName,
+      filters: [{ name: 'JSON', extensions: ['json'] }]
+    })
+    if (result.canceled || !result.filePath) return null
+    writeFileSync(result.filePath, content, 'utf-8')
+    return result.filePath
+  })
+  ipcMain.handle('dialog:open-file', async () => {
+    const result = await dialog.showOpenDialog(mainWindow!, {
+      properties: ['openFile'],
+      filters: [{ name: 'JSON', extensions: ['json'] }]
+    })
+    if (result.canceled || result.filePaths.length === 0) return null
+    return readFileSync(result.filePaths[0], 'utf-8')
+  })
 
   mainWindow = new BrowserWindow({
     width: 1200,

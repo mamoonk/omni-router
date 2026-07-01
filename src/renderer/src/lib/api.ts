@@ -238,6 +238,21 @@ export class ApiClient {
     return res.json()
   }
 
+  async exportApiKeys(): Promise<string> {
+    const res = await this.request(`${this.baseUrl}/api/settings/keys/export`)
+    const { data } = await res.json()
+    return data
+  }
+
+  async importApiKeys(base64: string): Promise<Record<string, boolean>> {
+    const res = await this.request(`${this.baseUrl}/api/settings/keys/import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: base64 })
+    })
+    return res.json()
+  }
+
   async applyEdits(edits: Array<{ path: string; content: string }>, projectRoot?: string | null): Promise<{ success: boolean; results: Array<{ path: string; status: string; error?: string }> }> {
     if (projectRoot) {
       const res = await this.request(`${this.baseUrl}/api/code/apply`, {
